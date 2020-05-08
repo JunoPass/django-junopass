@@ -1,17 +1,18 @@
-import setuptools
+from setuptools import setup, find_packages
 
 with open("README.md", "r") as fh:
     long_description = fh.read()
 
-setuptools.setup(
+setup(
     name="djjunopass",
     version="1.1.2",
     author="Felix Cheruiyot",
     author_email="felix@junopass.com",
     description="JunoPass support for Django. Implement OTP and Passwordless strategy.",
-    long_description=long_description,
+    # long_description=long_description,
+    # long_description_content_type="text/markdown",
     url="https://github.com/junopass/django-junopass",
-    packages=setuptools.find_packages(),
+    packages=find_packages(),
     classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",

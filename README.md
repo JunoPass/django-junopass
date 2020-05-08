@@ -6,16 +6,13 @@ Implementation of [JunoPass Authentication](https://developers.junopass.com/juno
 
 Create an account for access token and project id - [JunoPass Console](https://console.junopass.com)
 
-
 ## Get JunoPass public key
 
 Copy paste the JunoPass public key from ther [Documentation](https://developers.junopass.com/resources/junopass-public-key)
 
-
 ## Installation
 
     pip install djjunopass --upgrade
-
 
 ## Setup
 
