@@ -82,6 +82,7 @@ def login_view(request):
                 else:
                     request.session["djjunopass_challenge"] = valid_challenge
                     request.session["djjunopass_device_id"] = device_id
+                    return redirect("djjunopass:verify")
                 # End authorization
 
                 # Template response
