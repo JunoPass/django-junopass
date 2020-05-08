@@ -13,10 +13,20 @@
         {% endfor %}
         {% endif %}
         <!-- Authentication form -->
-        <form action="{% url 'junopass:login' %}" method="POST">
+        <form action="{% url 'junopass:login' %}{% if verify%}?verify=true{% endif %}" method="POST">
             {% csrf_token %}
             <h1 class="text-2xl">Log In</h1>
             <div class="pt-4 pb-2">
+                {% if verify %}
+                <label>{{form.otp.label}}</label>
+                <div class="py-2">
+                    <input type="hidden" name="challenge" value="{{challenge}}">
+                    <input type="hidden" name="device_id" value="{{device_id}}">
+                    <input type="number" name="otp" required
+                        class="bg-white focus:outline-none focus:shadow-outline border border-gray-300 rounded-lg py-2 px-4 block w-full appearance-none leading-normal"
+                        placeholder="Enter OTP code" value="{% if form.otp.value %}{{form.otp.value}}{% endif%}">
+                </div>
+                {% else %}
                 <label>{{form.identifier.label}}</label>
                 <div class="py-2">
                     <input type="text" name="identifier" required
@@ -24,6 +34,7 @@
                         placeholder="e.g name@company.com"
                         value="{% if form.identifier.value %}{{form.identifier.value}}{% endif%}">
                 </div>
+                {% endif %}
                 <!-- Render form errors -->
                 {% if form.errors %}
                 <div class="mb-2 p-2 bg-red-600 text-white">

@@ -48,8 +48,18 @@ def render_response(request, template_name, device_private_key, device_public_ke
 
 def login_view(request):
     """
-    STEP 1: Authenticate user.
+    Authenticate and verify user.
     """
+    verify = request.GET.get("verify", False)
+    next_url = request.GET.get("next", None)
+
+    if verify:
+        form = VerifyForm(request.POST or None)
+    else:
+        form = AuthForm(request.POST or None)
+
+    context = {'form': form}
+    
     try:
         device_public_key = request.COOKIES.get(
             settings.JUNOPASS_DEVICE_PUBLIC_KEY_NAME)
@@ -57,19 +67,35 @@ def login_view(request):
             settings.JUNOPASS_DEVICE_PRIVATE_KEY_NAME)
         project_id = settings.JUNOPASS_PROJECT_ID
         access_token = settings.JUNOPASS_ACCESS_TOKEN
-
-        next_url = request.GET.get("next", None)
-        form = AuthForm(request.POST or None)
         if request.method == "POST":
             # Implement step 1 request
-            if form.is_valid():
-                identifier = form.cleaned_data["identifier"]
+            if not verify:
+                if form.is_valid():
+                    identifier = form.cleaned_data["identifier"]
 
-                valid_challenge, device_id, login_request = jp.authenticate(
-                    "EMAIL", identifier, device_public_key)
-                if login_request:
+                    valid_challenge, device_id, login_request = jp.authenticate(
+                        "EMAIL", identifier, device_public_key)
+                    if login_request:
+                        result = jp.verify(
+                            valid_challenge, device_id, device_private_key)
+
+                        # Add user in the database and activate session
+                        identifier = result.get("identifier")
+                        user = authenticate(request, identifier=identifier)
+                        if not user:
+                            raise Exception("Could not login user")
+
+                        login(request, user)
+                        return redirect(next_url or settings.LOGIN_REDIRECT_URL)
+                    else:
+                        print(f"Valid challenge {valid_challenge}")
+                        context.update("challenge", valid_challenge)
+                        context.update("device_id", device_id)
+            else:
+                if form.is_valid():
+                    otp = form.cleaned_data["otp"]
                     result = jp.verify(
-                        valid_challenge, device_id, device_private_key)
+                        challenge, device_id, device_private_key, otp)
 
                     # Add user in the database and activate session
                     identifier = result.get("identifier")
@@ -79,15 +105,8 @@ def login_view(request):
 
                     login(request, user)
                     return redirect(next_url or settings.LOGIN_REDIRECT_URL)
-                else:
-                    print(f"Valid challenge {valid_challenge}")
-                    request.session["junopass_challenge"] = valid_challenge
-                    request.session["junopass_device_id"] = device_id
-                    return redirect("djjunopass:verify")
-                # End authorization
 
                 # Template response
-        context = {'form': form}
         return render_response(request, "djjunopass/login.html", device_private_key, device_public_key, context)
     except Exception as ex:
         form = AuthForm(request.POST or None)
@@ -95,43 +114,43 @@ def login_view(request):
         return render(request, "djjunopass/login.html", {"form": form})
 
 
-def verify_view(request):
-    """
-    STEP 2: Verify OTP
-    """
-    try:
-        device_public_key = request.COOKIES.get(
-            settings.JUNOPASS_DEVICE_PUBLIC_KEY_NAME)
-        device_private_key = request.COOKIES.get(
-            settings.JUNOPASS_DEVICE_PRIVATE_KEY_NAME)
+# def verify_view(request):
+#     """
+#     STEP 2: Verify OTP
+#     """
+#     try:
+#         device_public_key = request.COOKIES.get(
+#             settings.JUNOPASS_DEVICE_PUBLIC_KEY_NAME)
+#         device_private_key = request.COOKIES.get(
+#             settings.JUNOPASS_DEVICE_PRIVATE_KEY_NAME)
 
-        challenge = request.session.get("junopass_challenge")
-        device_id = request.session.get("junopass_device_id")
-        next_url = request.GET.get("next", None)
+#         challenge = request.session.get("junopass_challenge")
+#         device_id = request.session.get("junopass_device_id")
+#         next_url = request.GET.get("next", None)
 
-        print(f"Challenge: {challenge}")
-        print(f"Device id:{device_id}")
+#         print(f"Challenge: {challenge}")
+#         print(f"Device id:{device_id}")
 
-        form = VerifyForm(request.POST or None)
-        if request.method == "POST":
-            if form.is_valid():
-                otp = form.cleaned_data["otp"]
-                result = jp.verify(
-                    challenge, device_id, device_private_key, otp)
+#         form = VerifyForm(request.POST or None)
+#         if request.method == "POST":
+#             if form.is_valid():
+#                 otp = form.cleaned_data["otp"]
+#                 result = jp.verify(
+#                     challenge, device_id, device_private_key, otp)
 
-                # Add user in the database and activate session
-                identifier = result.get("identifier")
-                user = authenticate(request, identifier=identifier)
-                if not user:
-                    raise Exception("Could not login user")
+#                 # Add user in the database and activate session
+#                 identifier = result.get("identifier")
+#                 user = authenticate(request, identifier=identifier)
+#                 if not user:
+#                     raise Exception("Could not login user")
 
-                login(request, user)
-                return redirect(next_url or settings.LOGIN_REDIRECT_URL)
-        return render(request, "djjunopass/verify.html", {"form": form})
-    except Exception as ex:
-        form = VerifyForm(request.POST or None)
-        messages.error(request, str(ex))
-        return render(request, "djjunopass/verify.html", {"form": form})
+#                 login(request, user)
+#                 return redirect(next_url or settings.LOGIN_REDIRECT_URL)
+#         return render(request, "djjunopass/verify.html", {"form": form})
+#     except Exception as ex:
+#         form = VerifyForm(request.POST or None)
+#         messages.error(request, str(ex))
+#         return render(request, "djjunopass/verify.html", {"form": form})
 
 
 @login_required
@@ -140,4 +159,4 @@ def logout_view(request):
     Logout user
     """
     logout(request)
-    return redirect("junopass:login")
+    return redirect("djjunopass:login")
