@@ -1,7 +1,7 @@
 from django.shortcuts import (render, redirect)
 from django.template import loader
 from django.conf import settings
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login
@@ -84,7 +84,7 @@ def login_view(request):
                     request.session["challenge"] = valid_challenge
                     request.session["device_id"] = device_id
                     request.session.modified = True
-                    return redirect("djjunopass:verify")
+                    return HttpResponseRedirect("djjunopass:verify")
                 # End authorization
 
                 # Template response
