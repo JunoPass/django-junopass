@@ -88,9 +88,8 @@ def login_view(request):
                         login(request, user)
                         return redirect(next_url or settings.LOGIN_REDIRECT_URL)
                     else:
-                        print(f"Valid challenge {valid_challenge}")
-                        context.update("challenge", valid_challenge)
-                        context.update("device_id", device_id)
+                        context.update({"challenge": valid_challenge})
+                        context.update({"device_id": device_id})
             else:
                 if form.is_valid():
                     otp = form.cleaned_data["otp"]
