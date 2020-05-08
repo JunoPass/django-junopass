@@ -1,7 +1,7 @@
 from django.shortcuts import (render, redirect)
 from django.template import loader
 from django.conf import settings
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login
@@ -81,10 +81,9 @@ def login_view(request):
                     return redirect(next_url or settings.LOGIN_REDIRECT_URL)
                 else:
                     print(f"Valid challenge {valid_challenge}")
-                    request.session["challenge"] = valid_challenge
-                    request.session["device_id"] = device_id
-                    request.session.modified = True
-                    return HttpResponseRedirect("/auth/verify/")
+                    request.session["junopass_challenge"] = valid_challenge
+                    request.session["junopass_device_id"] = device_id
+                    return redirect("djjunopass:verify")
                 # End authorization
 
                 # Template response
@@ -106,8 +105,8 @@ def verify_view(request):
         device_private_key = request.COOKIES.get(
             settings.JUNOPASS_DEVICE_PRIVATE_KEY_NAME)
 
-        challenge = request.session.get("challenge")
-        device_id = request.session.get("device_id")
+        challenge = request.session.get("junopass_challenge")
+        device_id = request.session.get("junopass_device_id")
         next_url = request.GET.get("next", None)
 
         print(f"Challenge: {challenge}")
