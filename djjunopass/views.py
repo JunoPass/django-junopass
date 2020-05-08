@@ -102,23 +102,26 @@ def login_view(request):
                     context.update({"challenge": challenge})
                     context.update({"device_id": device_id})
                     context.update({"verify": True})
-                    
+
                     if form.is_valid():
-                        otp = form.cleaned_data["otp"]
-                        
-                        result = jp.verify(
-                            challenge, device_id, device_private_key, otp)
+                        try:
+                            otp = form.cleaned_data["otp"]
+                            result = jp.verify(
+                                challenge, device_id, device_private_key, otp)
 
-                        # Add user in the database and activate session
-                        identifier = result.get("identifier")
-                        user = authenticate(request, identifier=identifier)
-                        if not user:
-                            raise Exception("Could not login user")
+                            # Add user in the database and activate session
+                            identifier = result.get("identifier")
+                            user = authenticate(request, identifier=identifier)
+                            if not user:
+                                raise Exception("Could not login user")
 
-                        login(request, user)
-                        return redirect(next_url or settings.LOGIN_REDIRECT_URL)
-
-                # Template response
+                            login(request, user)
+                            return redirect(next_url or settings.LOGIN_REDIRECT_URL)
+                        except Exception as ex:
+                            messages.error(request, str(ex))
+                else:
+                    # Show default form incase challenge and device id are not available
+                    context.update({"verify": False})
         return render_response(request, "djjunopass/login.html", device_private_key, device_public_key, context)
     except Exception as ex:
         form = AuthForm(request.POST or None)
