@@ -104,7 +104,7 @@ def verify_view(request):
         device_private_key = request.COOKIES.get(
             settings.JUNOPASS_DEVICE_PRIVATE_KEY_NAME)
 
-        print(f"Session: {request.session}")
+        print(f"Session: {request.session.__dict__}")
         challenge = request.session.get("djjunopass_challenge")
         device_id = request.session.get("djjunopass_device_id")
         next_url = request.GET.get("next", None)
