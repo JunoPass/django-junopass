@@ -108,12 +108,15 @@ def verify_view(request):
         device_id = request.session.get("djjunopass_device_id")
         next_url = request.GET.get("next", None)
 
+        print(f"Challenge: {challenge}")
+        print(f"Device id:{device_id}")
+
         form = VerifyForm(request.POST or None)
         if request.method == "POST":
             if form.is_valid():
                 otp = form.cleaned_data["otp"]
                 result = jp.verify(
-                    valid_challenge, device_id, device_private_key, otp)
+                    challenge, device_id, device_private_key, otp)
 
                 # Add user in the database and activate session
                 identifier = result.get("identifier")
