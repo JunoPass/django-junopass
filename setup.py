@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="djjunopass",
-    version="1.0.5",
+    version="1.0.8",
     author="Felix Cheruiyot",
     author_email="felix@junopass.com",
     description="JunoPass support for Django. Implement OTP and Passwordless strategy.",
@@ -19,6 +19,6 @@ setuptools.setup(
     ],
     python_requires='>=3.6',
     install_requires=[
-        'junopass-py==1.0.5',
+        'junopass-py==1.0.7',
     ]
 )
