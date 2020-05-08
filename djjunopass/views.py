@@ -84,7 +84,7 @@ def login_view(request):
                     request.session["challenge"] = valid_challenge
                     request.session["device_id"] = device_id
                     request.session.modified = True
-                    return HttpResponseRedirect("djjunopass:verify")
+                    return HttpResponseRedirect("/auth/verify/")
                 # End authorization
 
                 # Template response
