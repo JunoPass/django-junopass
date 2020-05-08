@@ -6,17 +6,13 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login
 from django.contrib.auth import logout
-from django.urls import resolve
-import datetime
-import pytz
-
 from junopass import JunoPass
+import datetime
 
 from .forms import AuthForm, VerifyForm
 
 jp = JunoPass(settings.JUNOPASS_ACCESS_TOKEN,
               settings.JUNOPASS_PUBLIC_KEY, settings.JUNOPASS_PROJECT_ID)
-
 
 def set_cookie(response, key, value, days_expire=30):
     """
@@ -127,46 +123,6 @@ def login_view(request):
         form = AuthForm(request.POST or None)
         messages.error(request, str(ex))
         return render(request, "djjunopass/login.html", {"form": form})
-
-
-# def verify_view(request):
-#     """
-#     STEP 2: Verify OTP
-#     """
-#     try:
-#         device_public_key = request.COOKIES.get(
-#             settings.JUNOPASS_DEVICE_PUBLIC_KEY_NAME)
-#         device_private_key = request.COOKIES.get(
-#             settings.JUNOPASS_DEVICE_PRIVATE_KEY_NAME)
-
-#         challenge = request.session.get("junopass_challenge")
-#         device_id = request.session.get("junopass_device_id")
-#         next_url = request.GET.get("next", None)
-
-#         print(f"Challenge: {challenge}")
-#         print(f"Device id:{device_id}")
-
-#         form = VerifyForm(request.POST or None)
-#         if request.method == "POST":
-#             if form.is_valid():
-#                 otp = form.cleaned_data["otp"]
-#                 result = jp.verify(
-#                     challenge, device_id, device_private_key, otp)
-
-#                 # Add user in the database and activate session
-#                 identifier = result.get("identifier")
-#                 user = authenticate(request, identifier=identifier)
-#                 if not user:
-#                     raise Exception("Could not login user")
-
-#                 login(request, user)
-#                 return redirect(next_url or settings.LOGIN_REDIRECT_URL)
-#         return render(request, "djjunopass/verify.html", {"form": form})
-#     except Exception as ex:
-#         form = VerifyForm(request.POST or None)
-#         messages.error(request, str(ex))
-#         return render(request, "djjunopass/verify.html", {"form": form})
-
 
 @login_required
 def logout_view(request):
