@@ -1,1 +1,1 @@
-# django-junopass
+# Django JunoPass support
