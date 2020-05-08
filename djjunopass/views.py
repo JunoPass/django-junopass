@@ -82,6 +82,7 @@ def login_view(request):
                 else:
                     request.session["djjunopass_challenge"] = valid_challenge
                     request.session["djjunopass_device_id"] = device_id
+                    request.session.modified = True
                     return redirect("djjunopass:verify")
                 # End authorization
 
@@ -104,7 +105,6 @@ def verify_view(request):
         device_private_key = request.COOKIES.get(
             settings.JUNOPASS_DEVICE_PRIVATE_KEY_NAME)
 
-        print(f"Session: {request.session.__dict__}")
         challenge = request.session.get("djjunopass_challenge")
         device_id = request.session.get("djjunopass_device_id")
         next_url = request.GET.get("next", None)
