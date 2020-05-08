@@ -61,7 +61,7 @@ def login_view(request):
     else:
         form = AuthForm(request.POST or None)
         context.update({'form': form})
-        
+
     try:
         device_public_key = request.COOKIES.get(
             settings.JUNOPASS_DEVICE_PUBLIC_KEY_NAME)
@@ -96,6 +96,9 @@ def login_view(request):
             else:
                 if form.is_valid():
                     otp = form.cleaned_data["otp"]
+                    challenge = request.POST.get("challenge")
+                    device_id = request.POST.get("device_id")
+                    
                     result = jp.verify(
                         challenge, device_id, device_private_key, otp)
 
