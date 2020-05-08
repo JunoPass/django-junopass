@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setup(
     name="djjunopass",
-    version="1.1.3",
+    version="1.1.4",
     author="Felix Cheruiyot",
     author_email="felix@junopass.com",
     description="JunoPass support for Django. Implement OTP and Passwordless strategy.",
