@@ -80,6 +80,7 @@ def login_view(request):
                     login(request, user)
                     return redirect(next_url or settings.LOGIN_REDIRECT_URL)
                 else:
+                    print(f"Valid challenge {valid_challenge}")
                     request.session["challenge"] = valid_challenge
                     request.session["device_id"] = device_id
                     request.session.modified = True
