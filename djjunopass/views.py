@@ -86,11 +86,11 @@ def login_view(request):
 
                 # Template response
         context = {'form': form}
-        return render_response(request, "junopass/login.html", device_private_key, device_public_key, context)
+        return render_response(request, "djjunopass/login.html", device_private_key, device_public_key, context)
     except Exception as ex:
         form = AuthForm(request.POST or None)
         messages.error(request, str(ex))
-        return render(request, "junopass/login.html", {"form": form})
+        return render(request, "djjunopass/login.html", {"form": form})
 
 
 def verify_view(request):
@@ -122,11 +122,11 @@ def verify_view(request):
 
                 login(request, user)
                 return redirect(next_url or settings.LOGIN_REDIRECT_URL)
-        return render(request, "junopass/verify.html", {"form": form})
+        return render(request, "djjunopass/verify.html", {"form": form})
     except Exception as ex:
         form = VerifyForm(request.POST or None)
         messages.error(request, str(ex))
-        return render(request, "junopass/verify.html", {"form": form})
+        return render(request, "djjunopass/verify.html", {"form": form})
 
 
 @login_required

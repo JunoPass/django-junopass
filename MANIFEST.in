@@ -1,4 +1,6 @@
 include LICENSE.txt
 include README.md
-
-recursive-include polls/templates *
+recursive-include tests/* *
+recursive-include djjunopass/templates/* *
+global-exclude __pycache__
+global-exclude *.py[co]
