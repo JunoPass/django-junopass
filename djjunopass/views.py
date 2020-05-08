@@ -94,22 +94,29 @@ def login_view(request):
                         context.update({"device_id": device_id})
                         context.update({"verify": True})
             else:
-                if form.is_valid():
-                    otp = form.cleaned_data["otp"]
-                    challenge = request.POST.get("challenge")
-                    device_id = request.POST.get("device_id")
+                challenge = request.POST.get("challenge")
+                device_id = request.POST.get("device_id")
+
+                if challenge and device_id:
+                    # Keep verify form active
+                    context.update({"challenge": challenge})
+                    context.update({"device_id": device_id})
+                    context.update({"verify": True})
                     
-                    result = jp.verify(
-                        challenge, device_id, device_private_key, otp)
+                    if form.is_valid():
+                        otp = form.cleaned_data["otp"]
+                        
+                        result = jp.verify(
+                            challenge, device_id, device_private_key, otp)
 
-                    # Add user in the database and activate session
-                    identifier = result.get("identifier")
-                    user = authenticate(request, identifier=identifier)
-                    if not user:
-                        raise Exception("Could not login user")
+                        # Add user in the database and activate session
+                        identifier = result.get("identifier")
+                        user = authenticate(request, identifier=identifier)
+                        if not user:
+                            raise Exception("Could not login user")
 
-                    login(request, user)
-                    return redirect(next_url or settings.LOGIN_REDIRECT_URL)
+                        login(request, user)
+                        return redirect(next_url or settings.LOGIN_REDIRECT_URL)
 
                 # Template response
         return render_response(request, "djjunopass/login.html", device_private_key, device_public_key, context)
