@@ -66,6 +66,12 @@ def login_view(request):
         project_id = settings.JUNOPASS_PROJECT_ID
         access_token = settings.JUNOPASS_ACCESS_TOKEN
         if request.method == "POST":
+            verify = request.POST.get("verify")
+            # Capture verify flag sent through post items
+            if verify:
+                form = VerifyForm(request.POST or None)
+                context.update({'form': form})   
+
             # Implement step 1 request
             if not verify:
                 if form.is_valid():
