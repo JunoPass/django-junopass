@@ -20,6 +20,6 @@ setup(
     ],
     python_requires='>=3.6',
     install_requires=[
-        'junopass-py==1.0.8',
+        'junopass-py==1.0.9',
     ]
 )
