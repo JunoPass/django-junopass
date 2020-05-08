@@ -1,6 +1,6 @@
 include LICENSE.txt
 include README.md
-recursive-include tests/* *
-recursive-include djjunopass/templates/* *
+recursive-include djjunopass/tests/* *
+recursive-include djjunopass/templates *
 global-exclude __pycache__
 global-exclude *.py[co]
