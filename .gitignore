@@ -1,0 +1,4 @@
+*.pyc
+djjunopass.egg-info/
+dist/
+__pycache__/
